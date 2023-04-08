@@ -2,7 +2,7 @@ const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-
+const cookie = require('cookie');
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -100,7 +100,7 @@ exports.signin = (req, res) => {
       for (let i = 0; i < user.roles.length; i++) {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
       }
-      res.status(200).send({
+      res.cookie('auth', token, { httpOnly: true }).status(200).send({
         id: user._id,
         username: user.username,
         email: user.email,
