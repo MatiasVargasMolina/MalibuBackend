@@ -5,19 +5,25 @@ const User = db.user;
 const Role = db.role;
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
-
-  if (!token) {
-    return res.status(403).send({ message: "No token provided!" });
-  }
-
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Unauthorized!" });
+  try{
+    const tokenCookie=req.headers.cookie
+    const parts = tokenCookie.split("=")
+    const token = parts[1];
+    if (!token) {
+      return res.status(403).send({ message: "No token provided!" });
     }
-    req.userId = decoded.id;
-    next();
-  });
+  
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({ message: "Unauthorized!" });
+      }
+      res.userId = decoded.id;
+      next();
+    });
+  }
+  catch(err){
+    res.status(401)
+  }
 };
 
 isAdmin = (req, res, next) => {

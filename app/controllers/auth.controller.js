@@ -61,7 +61,26 @@ exports.signup = (req, res) => {
     }
   });
 };
+exports.checklogin= (req,res) => {
+  const tokenCookie=req.headers.cookie
+  const parts = tokenCookie.split("=")
+  const token = parts[1];
 
+// Decodificar el cuerpo de la cookie
+
+  console.log(tokenCookie+"\n"+token)
+  if (!token) {
+    return res.status(403).send({ message: "No token provided!" });
+  }
+
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Unauthorized!" });
+    }
+    req.userId = decoded._id;
+    res.send(req);
+  });
+}
 exports.signin = (req, res) => {
   User.findOne({
     email: req.body.username
